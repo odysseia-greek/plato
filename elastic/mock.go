@@ -21,14 +21,14 @@ func init() {
 	_, callingFile, _, _ := runtime.Caller(0)
 	callingDir := filepath.Dir(callingFile)
 	dirParts := strings.Split(callingDir, string(os.PathSeparator))
-	var odysseiaPath []string
+	var platoElasticPath []string
 	for i, part := range dirParts {
-		if part == "odysseia" {
-			odysseiaPath = dirParts[0 : i+1]
+		if part == "elastic" {
+			platoElasticPath = dirParts[0 : i+1]
 		}
 	}
 	l := "/"
-	for _, path := range odysseiaPath {
+	for _, path := range platoElasticPath {
 		l = filepath.Join(l, path)
 	}
 	eratosthenesDir := filepath.Join(l, "eratosthenes", "*.json")
@@ -84,11 +84,11 @@ func CreateMockClient(fixtureFile string, statusCode int) (*elasticsearch.Client
 	}
 
 	body := fixture(fmt.Sprintf("%s.json", fixtureFile))
-
 	mockTrans := MockTransport{
 		Response: &http.Response{
 			StatusCode: mockCode,
 			Body:       body,
+			Header:     http.Header{"X-Elastic-Product": []string{"Elasticsearch"}},
 		},
 	}
 	mockTrans.RoundTripFn = func(req *http.Request) (*http.Response, error) { return mockTrans.Response, nil }

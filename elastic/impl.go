@@ -2,6 +2,7 @@ package elastic
 
 import (
 	"crypto/x509"
+	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/kpango/glg"
 	"github.com/odysseia-greek/plato/models"
 	"net/http"

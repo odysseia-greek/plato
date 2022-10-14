@@ -2,6 +2,7 @@ package queue
 
 import (
 	"fmt"
+	"github.com/kubemq-io/kubemq-go"
 	"github.com/odysseia-greek/plato/models"
 )
 

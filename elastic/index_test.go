@@ -104,7 +104,7 @@ func TestCreateIndexClient(t *testing.T) {
 
 		sut, err := testClient.Index().Create(index, body)
 		assert.NotNil(t, err)
-		assert.Nil(t, sut)
+		assert.False(t, sut.Acknowledged)
 	})
 
 	t.Run("Malformed", func(t *testing.T) {
@@ -198,7 +198,7 @@ func TestDeleteIndexClient(t *testing.T) {
 		assert.Nil(t, err)
 
 		sut, err := testClient.Index().Delete(index)
-		assert.Nil(t, err)
+		assert.NotNil(t, err)
 		assert.False(t, sut)
 	})
 

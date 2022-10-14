@@ -62,7 +62,7 @@ func NewVaultClient(address, token string, tlsConfig *api.TLSConfig) (Client, er
 	} else {
 		glg.Debug("no token set")
 	}
-	
+
 	return &Vault{Connection: client, SecretPath: defaultPath}, nil
 }
 
