@@ -1,5 +1,5 @@
 package elastic
 
 const (
-	errorMessage string = "elasticSearch returned an error"
+	errorMessage string = "informations from Elasticsearch"
 )
