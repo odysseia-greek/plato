@@ -10,6 +10,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
+	"strings"
 )
 
 type KubeClient interface {
@@ -183,6 +184,20 @@ func NewConfigBasedKube(config []byte, ns string) (*Kube, error) {
 	c, err := clientcmd.NewClientConfigFromBytes(config)
 	if err != nil {
 		return nil, err
+	}
+
+	raw, err := c.RawConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	if raw.CurrentContext == "" {
+		for key, _ := range raw.Contexts {
+			if strings.Contains(key, "desktop") {
+				c = clientcmd.NewNonInteractiveClientConfig(raw, key, nil, nil)
+				break
+			}
+		}
 	}
 
 	restConfig, err := c.ClientConfig()
