@@ -1,4 +1,4 @@
-package aristoteles
+package randomizer
 
 import (
 	"fmt"

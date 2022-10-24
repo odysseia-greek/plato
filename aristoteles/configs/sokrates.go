@@ -2,12 +2,12 @@ package configs
 
 import (
 	"github.com/odysseia-greek/plato/elastic"
-	"github.com/odysseia/aristoteles"
+	"github.com/odysseia-greek/plato/randomizer"
 )
 
 type SokratesConfig struct {
 	Elastic    elastic.Client
-	Randomizer aristoteles.Random
+	Randomizer randomizer.Randomizer.Randomizer
 	SearchWord string
 	Index      string
 }

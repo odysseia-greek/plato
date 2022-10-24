@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/dgraph-io/badger/v3 v3.2103.2
 	github.com/elastic/go-elasticsearch/v7 v7.17.1
+	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/vault v1.12.0
 	github.com/hashicorp/vault/api v1.8.0
 	github.com/hashicorp/vault/api/auth/kubernetes v0.3.0
@@ -130,7 +131,6 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.1.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.4.0 // indirect
 	github.com/gophercloud/gophercloud v0.1.0 // indirect
-	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/gosuri/uitable v0.0.4 // indirect
 	github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7 // indirect
