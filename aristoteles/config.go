@@ -11,6 +11,7 @@ import (
 	"github.com/odysseia-greek/plato/kubernetes"
 	"github.com/odysseia-greek/plato/models"
 	"github.com/odysseia-greek/plato/queue"
+	"github.com/odysseia-greek/plato/randomizer"
 	"github.com/odysseia-greek/plato/service"
 	"github.com/odysseia-greek/plato/vault"
 	"gopkg.in/yaml.v3"
@@ -274,7 +275,7 @@ func (c *Config) fillFields(e *reflect.Value) {
 			mv := reflect.ValueOf(mq)
 			e.FieldByName(fieldName).Set(mv)
 
-		case reflect.TypeOf((*Random)(nil)).Elem():
+		case reflect.TypeOf((*randomizer.Random)(nil)).Elem():
 			reflectedRandomizer, err := c.getRandomizer()
 			if err != nil {
 				glg.Fatal("error getting randomizer")
