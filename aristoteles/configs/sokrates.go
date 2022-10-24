@@ -7,7 +7,7 @@ import (
 
 type SokratesConfig struct {
 	Elastic    elastic.Client
-	Randomizer randomizer.Randomizer.Randomizer
+	Randomizer randomizer.Randomizer
 	SearchWord string
 	Index      string
 }
