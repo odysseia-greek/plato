@@ -137,9 +137,9 @@ func (c *Config) getVaultClient() (vault.Client, error) {
 }
 
 func (c *Config) getTokenFromFile(namespace string) (string, error) {
-	path := "odysseia"
+	path := "odysseia-greek"
 	rootPath := c.OdysseiaRootPath(path)
-	clusterKeys := filepath.Join(rootPath, "eratosthenes", "fixture", "vault", fmt.Sprintf("cluster-keys-%s.json", namespace))
+	clusterKeys := filepath.Join(rootPath, "plato", "vault", "eratosthenes", fmt.Sprintf("cluster-keys-%s.json", namespace))
 
 	f, err := ioutil.ReadFile(clusterKeys)
 	if err != nil {
