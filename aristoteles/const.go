@@ -1,7 +1,7 @@
 package aristoteles
 
 const (
-	defaultSidecarService    = "http://127.0.0.1:5001"
+	defaultSidecarService    = "http://127.0.0.1:50051"
 	defaultKubeConfig        = "/.kube/config"
 	defaultNamespace         = "odysseia"
 	defaultPodName           = "somepod-08595-383"

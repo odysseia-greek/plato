@@ -3,7 +3,7 @@ package aristoteles
 import (
 	"github.com/kpango/glg"
 	"github.com/odysseia-greek/plato/elastic"
-	"github.com/odysseia-greek/plato/models"
+	pb "github.com/odysseia-greek/plato/proto"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -26,9 +26,8 @@ func (c *Config) getElasticClient() (elastic.Client, error) {
 	} else {
 		if c.BaseConfig.TLSEnabled {
 			glg.Debug("getting es config from vault")
-			//todo enable https for sidecars
-			localHttps := false
-			vaultConf, err := c.getConfigFromVault(localHttps)
+
+			vaultConf, err := c.getConfigFromVault()
 			if err != nil {
 				glg.Fatalf("error getting config from sidecar, shutting down: %s", err)
 			}
@@ -67,13 +66,13 @@ func (c *Config) getElasticClient() (elastic.Client, error) {
 	return es, nil
 }
 
-func (c *Config) mapVaultToConf(vaultModel *models.ElasticConfigVault, tls bool) elastic.Config {
+func (c *Config) mapVaultToConf(vaultModel *pb.ElasticConfigVault, tls bool) elastic.Config {
 	elasticService := c.getElasticServiceFromEnv(tls)
 
 	conf := elastic.Config{
 		Service:     elasticService,
-		Username:    vaultModel.Username,
-		Password:    vaultModel.Password,
+		Username:    vaultModel.ElasticUsername,
+		Password:    vaultModel.ElasticPassword,
 		ElasticCERT: vaultModel.ElasticCERT,
 	}
 
