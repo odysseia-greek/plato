@@ -12,8 +12,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
-	"strings"
 	"time"
 
 	pb "github.com/odysseia-greek/plato/proto"
@@ -137,9 +135,9 @@ func (c *Config) getVaultClient() (vault.Client, error) {
 }
 
 func (c *Config) getTokenFromFile(namespace string) (string, error) {
-	path := "odysseia-greek"
-	rootPath := c.OdysseiaRootPath(path)
-	clusterKeys := filepath.Join(rootPath, "plato", "vault", "eratosthenes", fmt.Sprintf("cluster-keys-%s.json", namespace))
+	rootPath := c.OdysseiaRootPath(ODYSSEIA_PATH)
+	platoPath := c.GetPlatoPath(rootPath)
+	clusterKeys := filepath.Join(platoPath, "vault", "eratosthenes", fmt.Sprintf("cluster-keys-%s.json", namespace))
 
 	f, err := ioutil.ReadFile(clusterKeys)
 	if err != nil {
@@ -153,22 +151,4 @@ func (c *Config) getTokenFromFile(namespace string) (string, error) {
 	json.Unmarshal(f, &result)
 
 	return result["root_token"].(string), nil
-}
-
-func (c *Config) OdysseiaRootPath(path string) string {
-	_, callingFile, _, _ := runtime.Caller(0)
-	callingDir := filepath.Dir(callingFile)
-	dirParts := strings.Split(callingDir, string(os.PathSeparator))
-	var odysseiaPath []string
-	for i, part := range dirParts {
-		if part == path {
-			odysseiaPath = dirParts[0 : i+1]
-		}
-	}
-	l := "/"
-	for _, path := range odysseiaPath {
-		l = filepath.Join(l, path)
-	}
-
-	return l
 }

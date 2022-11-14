@@ -138,9 +138,9 @@ func (c *Config) getCert() []byte {
 
 	if c.BaseConfig.TestOverwrite {
 		glg.Info("trying to read cert file from file")
-		path := "odysseia-greek"
-		rootPath := c.OdysseiaRootPath(path)
-		certPath := filepath.Join(rootPath, "plato", "elastic", "eratosthenes", "elastic-test-cert.pem")
+		rootPath := c.OdysseiaRootPath(ODYSSEIA_PATH)
+		platoPath := c.GetPlatoPath(rootPath)
+		certPath := filepath.Join(platoPath, "elastic", "eratosthenes", "elastic-test-cert.pem")
 
 		cert, _ = ioutil.ReadFile(certPath)
 
