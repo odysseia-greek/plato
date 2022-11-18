@@ -30,4 +30,26 @@ func TestClientCreation(t *testing.T) {
 		assert.NotNil(t, kube)
 		assert.Nil(t, err)
 	})
+
+	t.Run("ConfigWhenNonIsSetAlsoWorks", func(t *testing.T) {
+		var filePath string
+
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			glg.Error(err)
+		}
+
+		filePath = filepath.Join(homeDir, defaultKubeConfig)
+
+		cfg, err := ioutil.ReadFile(filePath)
+		assert.Nil(t, err)
+
+		kube, err := NewKubeClient(cfg, ns)
+		assert.NotNil(t, kube)
+		assert.Nil(t, err)
+
+		kubeContext, err := kube.Cluster().GetCurrentContext()
+		assert.NotEqual(t, "", kubeContext)
+		assert.Nil(t, err)
+	})
 }

@@ -46,6 +46,7 @@ type Configuration interface {
 type Cluster interface {
 	GetHostServer() (string, error)
 	GetHostCaCert() ([]byte, error)
+	GetCurrentContext() (string, error)
 }
 
 type Namespace interface {

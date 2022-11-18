@@ -72,3 +72,12 @@ func (c *ClusterImpl) GetHostCaCert() ([]byte, error) {
 
 	return nil, nil
 }
+
+func (c *ClusterImpl) GetCurrentContext() (string, error) {
+	config, err := models.UnmarshalKubeConfig(c.kubeConfig)
+	if err != nil {
+		return "", err
+	}
+
+	return config.CurrentContext, nil
+}
