@@ -1,0 +1,20 @@
+syntax = "proto3";
+option go_package = "github.com/odysseia-greek/plato/proto";
+
+package proto;
+
+
+service Ptolemaios {
+  // Get the config from ptolemaios
+  rpc GetSecret (VaultRequest) returns (ElasticConfigVault) {}
+}
+
+message VaultRequest {
+}
+
+// The response message with the config taken from vault
+message ElasticConfigVault {
+  string elasticUsername = 1;
+  string elasticPassword = 2;
+  string ElasticCERT = 3;
+}
