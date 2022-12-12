@@ -1,60 +1,51 @@
 package aristoteles
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/vault/api"
 	"github.com/kpango/glg"
-	"github.com/odysseia-greek/plato/models"
-	"github.com/odysseia-greek/plato/service"
 	"github.com/odysseia-greek/plato/vault"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"io/ioutil"
-	"net/url"
 	"os"
 	"path/filepath"
-	"runtime"
-	"strings"
 	"time"
+
+	pb "github.com/odysseia-greek/plato/proto"
 )
 
 const (
 	VAULT = "vault"
 )
 
-func (c *Config) getConfigFromVault(localHttps bool) (*models.ElasticConfigVault, error) {
+func (c *Config) getConfigFromVault() (*pb.ElasticConfigVault, error) {
 	sidecarService := os.Getenv(EnvPtolemaiosService)
 	if sidecarService == "" {
 		glg.Infof("defaulting to %s for sidecar", defaultSidecarService)
 		sidecarService = defaultSidecarService
 	}
 
-	u, err := url.Parse(sidecarService)
+	conn, err := grpc.Dial(sidecarService, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := pb.NewPtolemaiosClient(conn)
+
+	// Contact the server and print out its response.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := client.GetSecret(ctx, &pb.VaultRequest{})
 	if err != nil {
 		return nil, err
 	}
 
-	var cert []byte
-	if localHttps {
-		rootPath := os.Getenv("CERT_ROOT")
-		fileName := filepath.Join(rootPath, "ptolemaios")
-		cert, _ = ioutil.ReadFile(fileName)
-	}
+	glg.Infof("found secret %s", r)
 
-	ptolemaiosClient, err := service.NewPtolemaiosConfig(u.Scheme, u.Host, cert, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	glg.Debug("client created, getting secret")
-
-	secret, err := ptolemaiosClient.GetSecret()
-	if err != nil {
-		return nil, err
-	}
-
-	glg.Debug("secret returned")
-
-	return secret, nil
+	return r, nil
 }
 
 func (c *Config) getVaultClient() (vault.Client, error) {
@@ -144,9 +135,9 @@ func (c *Config) getVaultClient() (vault.Client, error) {
 }
 
 func (c *Config) getTokenFromFile(namespace string) (string, error) {
-	path := "odysseia"
-	rootPath := c.OdysseiaRootPath(path)
-	clusterKeys := filepath.Join(rootPath, "eratosthenes", "fixture", "vault", fmt.Sprintf("cluster-keys-%s.json", namespace))
+	rootPath := c.OdysseiaRootPath(ODYSSEIA_PATH)
+	platoPath := c.GetPlatoPath(rootPath)
+	clusterKeys := filepath.Join(platoPath, "vault", "eratosthenes", fmt.Sprintf("cluster-keys-%s.json", namespace))
 
 	f, err := ioutil.ReadFile(clusterKeys)
 	if err != nil {
@@ -160,22 +151,4 @@ func (c *Config) getTokenFromFile(namespace string) (string, error) {
 	json.Unmarshal(f, &result)
 
 	return result["root_token"].(string), nil
-}
-
-func (c *Config) OdysseiaRootPath(path string) string {
-	_, callingFile, _, _ := runtime.Caller(0)
-	callingDir := filepath.Dir(callingFile)
-	dirParts := strings.Split(callingDir, string(os.PathSeparator))
-	var odysseiaPath []string
-	for i, part := range dirParts {
-		if part == path {
-			odysseiaPath = dirParts[0 : i+1]
-		}
-	}
-	l := "/"
-	for _, path := range odysseiaPath {
-		l = filepath.Join(l, path)
-	}
-
-	return l
 }

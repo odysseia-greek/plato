@@ -2,7 +2,7 @@ package aristoteles
 
 import (
 	"github.com/odysseia-greek/plato/aristoteles/configs"
-	"github.com/odysseia-greek/plato/models"
+	pb "github.com/odysseia-greek/plato/proto"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -718,17 +718,17 @@ func TestElasticClient(t *testing.T) {
 			},
 		}
 
-		vaultModel := models.ElasticConfigVault{
-			Username:    "testuser",
-			Password:    "testpassword",
-			ElasticCERT: "amegahugecert",
+		vaultModel := pb.ElasticConfigVault{
+			ElasticUsername: "testuser",
+			ElasticPassword: "testpassword",
+			ElasticCERT:     "amegahugecert",
 		}
 
 		sut := configManager.mapVaultToConf(&vaultModel, true)
 
 		assert.Equal(t, elasticServiceDefaultTlS, sut.Service)
-		assert.Equal(t, vaultModel.Username, sut.Username)
-		assert.Equal(t, vaultModel.Password, sut.Password)
+		assert.Equal(t, vaultModel.ElasticUsername, sut.Username)
+		assert.Equal(t, vaultModel.ElasticPassword, sut.Password)
 		assert.Equal(t, vaultModel.ElasticCERT, sut.ElasticCERT)
 	})
 

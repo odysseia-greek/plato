@@ -345,7 +345,7 @@ func (c *Config) getSliceFromEnv(sliceName string) []string {
 func (c *Config) getBoolFromEnv(envName string) bool {
 	var value bool
 	envValue := os.Getenv(envName)
-	if envValue == "" {
+	if envValue == "" || envValue == "no" || envValue == "false" {
 		value = false
 	} else {
 		value = true
