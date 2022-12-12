@@ -18,9 +18,10 @@ func TestPtolemaiosClient(t *testing.T) {
 		ElasticCERT: cert,
 	}
 	config := ClientConfig{
-		Scheme:        scheme,
-		SolonUrl:      "",
-		PtolemaiosUrl: baseUrl,
+		Ptolemaios: OdysseiaApi{
+			Url:    baseUrl,
+			Scheme: scheme,
+		},
 	}
 
 	t.Run("Get", func(t *testing.T) {

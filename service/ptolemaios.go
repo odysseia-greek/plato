@@ -1,7 +1,6 @@
 package service
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/kpango/glg"
@@ -20,9 +19,9 @@ const (
 	secretEndpoint string = "/ptolemaios/v1/secret"
 )
 
-func NewPtolemaiosConfig(scheme, baseUrl string, ca []byte, certs []tls.Certificate) (*PtolemaiosImpl, error) {
-	client := NewHttpClient(ca, certs)
-	return &PtolemaiosImpl{Scheme: scheme, BaseUrl: baseUrl, Client: client}, nil
+func NewPtolemaiosConfig(schema OdysseiaApi, ca []byte) (*PtolemaiosImpl, error) {
+	client := NewHttpClient(ca, schema.Cert)
+	return &PtolemaiosImpl{Scheme: schema.Scheme, BaseUrl: schema.Url, Client: client}, nil
 }
 
 func NewFakePtolemaiosConfig(scheme, baseUrl string, client HttpClient) (*PtolemaiosImpl, error) {

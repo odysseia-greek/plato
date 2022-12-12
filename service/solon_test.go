@@ -13,9 +13,10 @@ func TestSolonClient(t *testing.T) {
 	tokenResponse := models.TokenResponse{Token: token}
 	postResponse := models.SolonResponse{Created: true}
 	config := ClientConfig{
-		Scheme:        scheme,
-		SolonUrl:      baseUrl,
-		PtolemaiosUrl: "",
+		Solon: OdysseiaApi{
+			Scheme: scheme,
+			Url:    baseUrl,
+		},
 	}
 
 	requestBody := models.SolonCreationRequest{
