@@ -4,6 +4,7 @@ import (
 	"github.com/odysseia-greek/plato/aristoteles/configs"
 	pb "github.com/odysseia-greek/plato/proto"
 	"github.com/stretchr/testify/assert"
+	"net/url"
 	"os"
 	"testing"
 )
@@ -797,5 +798,38 @@ func TestThalesConfigCreation(t *testing.T) {
 
 		os.Unsetenv(EnvHealthCheckOverwrite)
 		os.Unsetenv(EnvChannel)
+	})
+}
+
+func TestHomerosConfigCreation(t *testing.T) {
+	t.Run("StandardConfig", func(t *testing.T) {
+		cfg := configs.HomerosConfig{}
+
+		sut, err := NewConfig(cfg)
+		assert.Nil(t, err)
+		assert.NotNil(t, sut)
+
+		homerosConfig, ok := sut.(*configs.HomerosConfig)
+		assert.True(t, ok)
+		assert.NotNil(t, homerosConfig.Cache)
+		assert.NotNil(t, homerosConfig.HttpClients)
+	})
+
+	t.Run("AddressesAreSettable", func(t *testing.T) {
+		expected := "http://localhost:5000"
+		_, err := url.Parse(expected)
+		assert.Nil(t, err)
+
+		os.Setenv(EnvHerodotosService, expected)
+		cfg := configs.HomerosConfig{}
+
+		sut, err := NewConfig(cfg)
+		assert.Nil(t, err)
+		assert.NotNil(t, sut)
+
+		homerosConfig, ok := sut.(*configs.HomerosConfig)
+		assert.True(t, ok)
+		assert.NotNil(t, homerosConfig.Cache)
+		os.Unsetenv(EnvHerodotosService)
 	})
 }
