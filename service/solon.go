@@ -11,17 +11,16 @@ import (
 type SolonImpl struct {
 	Scheme  string
 	BaseUrl string
-	UUID    string
 	Client  HttpClient
 }
 
 func NewSolonImpl(schema OdysseiaApi, ca []byte) (*SolonImpl, error) {
 	client := NewHttpClient(ca, schema.Cert)
-	return &SolonImpl{Scheme: schema.Scheme, BaseUrl: schema.Url, Client: client, UUID: ""}, nil
+	return &SolonImpl{Scheme: schema.Scheme, BaseUrl: schema.Url, Client: client}, nil
 }
 
 func NewFakeSolonImpl(scheme, baseUrl string, client HttpClient) (*SolonImpl, error) {
-	return &SolonImpl{Scheme: scheme, BaseUrl: baseUrl, Client: client, UUID: ""}, nil
+	return &SolonImpl{Scheme: scheme, BaseUrl: baseUrl, Client: client}, nil
 }
 
 func (s *SolonImpl) OneTimeToken() (*http.Response, error) {
@@ -31,7 +30,7 @@ func (s *SolonImpl) OneTimeToken() (*http.Response, error) {
 		Path:   path.Join(solonService, version, token),
 	}
 
-	response, err := s.Client.Get(&urlPath, s.UUID)
+	response, err := s.Client.Get(&urlPath)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +54,7 @@ func (s *SolonImpl) Register(requestBody models.SolonCreationRequest) (*http.Res
 		return nil, err
 	}
 
-	response, err := s.Client.Post(&urlPath, body, s.UUID)
+	response, err := s.Client.Post(&urlPath, body)
 	if err != nil {
 		return nil, err
 	}
@@ -74,5 +73,5 @@ func (s *SolonImpl) Health() (*http.Response, error) {
 		Path:   path.Join(solonService, version, healthEndPoint),
 	}
 
-	return Health(healthPath, s.Client, s.UUID)
+	return Health(healthPath, s.Client)
 }
