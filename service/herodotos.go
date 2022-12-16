@@ -3,10 +3,11 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/kpango/glg"
 	"github.com/odysseia-greek/plato/models"
 	"net/http"
 	"net/url"
+	"path"
+	//"path"
 )
 
 type HerodotosImpl struct {
@@ -14,14 +15,6 @@ type HerodotosImpl struct {
 	BaseUrl string
 	Client  HttpClient
 }
-
-const (
-	pre      string = "/herodotos/v1"
-	authors  string = "authors"
-	books    string = "books"
-	question string = "createQuestion"
-	sentence string = "checkSentence"
-)
 
 func NewHerodotosConfig(schema OdysseiaApi, ca []byte) (*HerodotosImpl, error) {
 	client := NewHttpClient(ca, schema.Cert)
@@ -32,100 +25,71 @@ func NewFakeHerodotosConfig(scheme, baseUrl string, client HttpClient) (*Herodot
 	return &HerodotosImpl{Scheme: scheme, BaseUrl: baseUrl, Client: client}, nil
 }
 
-func (h *HerodotosImpl) GetAuthors() (*models.Authors, error) {
-	path := url.URL{
+func (h *HerodotosImpl) GetAuthors() (*http.Response, error) {
+	authorPath := url.URL{
 		Scheme: h.Scheme,
 		Host:   h.BaseUrl,
-		Path:   fmt.Sprintf("%s/%s", pre, authors),
+		Path:   fmt.Sprintf("%s/%s/%s", herodotosService, version, authors),
 	}
 
-	response, err := h.Client.Get(&path)
+	response, err := h.Client.Get(&authorPath)
 	if err != nil {
 		return nil, err
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("expected %v but got %v while calling %v endpoint", http.StatusOK, response.StatusCode, path)
+		return nil, fmt.Errorf("expected %v but got %v while calling %v endpoint", http.StatusOK, response.StatusCode, authorPath)
 	}
 
-	defer response.Body.Close()
-
-	var authors models.Authors
-	err = json.NewDecoder(response.Body).Decode(&authors)
-	if err != nil {
-		return nil, err
-	}
-
-	glg.Debug(authors)
-
-	return &authors, nil
+	return response, nil
 }
 
-func (h *HerodotosImpl) GetBooks(authorId string) (*models.Books, error) {
-	path := url.URL{
+func (h *HerodotosImpl) GetBooks(authorId string) (*http.Response, error) {
+	bookPath := url.URL{
 		Scheme: h.Scheme,
 		Host:   h.BaseUrl,
-		Path:   fmt.Sprintf("%s/%s/%s/%s", pre, authors, authorId, books),
+		Path:   fmt.Sprintf("%s/%s/%s/%s/%s", herodotosService, version, authors, authorId, books),
 	}
 
-	response, err := h.Client.Get(&path)
+	response, err := h.Client.Get(&bookPath)
 	if err != nil {
 		return nil, err
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("expected %v but got %v while calling %v endpoint", http.StatusOK, response.StatusCode, path)
+		return nil, fmt.Errorf("expected %v but got %v while calling %v endpoint", http.StatusOK, response.StatusCode, bookPath)
 	}
 
-	defer response.Body.Close()
-
-	var books models.Books
-	err = json.NewDecoder(response.Body).Decode(&books)
-	if err != nil {
-		return nil, err
-	}
-
-	glg.Debug(books)
-
-	return &books, nil
+	return response, nil
 }
 
-func (h *HerodotosImpl) CreateQuestion(author, book string) (*models.CreateSentenceResponse, error) {
+func (h *HerodotosImpl) CreateQuestion(author, book string) (*http.Response, error) {
 	query := fmt.Sprintf("author=%s&book=%s", author, book)
-	path := url.URL{
+	questionPath := url.URL{
 		Scheme:   h.Scheme,
 		Host:     h.BaseUrl,
-		Path:     fmt.Sprintf("%s/%s", pre, question),
+		Path:     fmt.Sprintf("%s/%s/%s", herodotosService, version, question),
 		RawQuery: query,
 	}
 
-	response, err := h.Client.Get(&path)
+	response, err := h.Client.Get(&questionPath)
 	if err != nil {
 		return nil, err
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("expected %v but got %v while calling %v endpoint", http.StatusOK, response.StatusCode, path)
+		return nil, fmt.Errorf("expected %v but got %v while calling %v endpoint", http.StatusOK, response.StatusCode, questionPath)
 	}
 
-	defer response.Body.Close()
+	return response, nil
 
-	var sentence models.CreateSentenceResponse
-	err = json.NewDecoder(response.Body).Decode(&sentence)
-	if err != nil {
-		return nil, err
-	}
-
-	glg.Debug(sentence)
-
-	return &sentence, nil
 }
 
-func (h *HerodotosImpl) CheckSentence(checkSentenceRequest models.CheckSentenceRequest) (*models.CheckSentenceResponse, error) {
-	path := url.URL{
+func (h *HerodotosImpl) CheckSentence(checkSentenceRequest models.CheckSentenceRequest) (*http.Response, error) {
+	sentencePath := url.URL{
 		Scheme: h.Scheme,
 		Host:   h.BaseUrl,
-		Path:   fmt.Sprintf("%s/%s", pre, sentence),
+		Path:   fmt.Sprintf("%s/%s/%s", herodotosService, version, sentence),
 	}
 
 	body, err := json.Marshal(checkSentenceRequest)
@@ -133,24 +97,24 @@ func (h *HerodotosImpl) CheckSentence(checkSentenceRequest models.CheckSentenceR
 		return nil, err
 	}
 
-	response, err := h.Client.Post(&path, body)
+	response, err := h.Client.Post(&sentencePath, body)
 	if err != nil {
 		return nil, err
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("expected %v but got %v while calling %v endpoint", http.StatusOK, response.StatusCode, path)
+		return nil, fmt.Errorf("expected %v but got %v while calling %v endpoint", http.StatusOK, response.StatusCode, sentencePath)
 	}
 
-	defer response.Body.Close()
+	return response, nil
+}
 
-	var sentence models.CheckSentenceResponse
-	err = json.NewDecoder(response.Body).Decode(&sentence)
-	if err != nil {
-		return nil, err
+func (h *HerodotosImpl) Health() (*http.Response, error) {
+	healthPath := url.URL{
+		Scheme: h.Scheme,
+		Host:   h.BaseUrl,
+		Path:   path.Join(herodotosService, version, healthEndPoint),
 	}
 
-	glg.Debug(sentence)
-
-	return &sentence, nil
+	return Health(healthPath, h.Client)
 }

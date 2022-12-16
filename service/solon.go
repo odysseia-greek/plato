@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/odysseia-greek/plato/models"
 	"net/http"
@@ -12,32 +11,27 @@ import (
 type SolonImpl struct {
 	Scheme  string
 	BaseUrl string
+	UUID    string
 	Client  HttpClient
 }
 
-const (
-	solonService     string = "solon"
-	tokenEndpoint    string = "token"
-	registerEndpoint string = "register"
-)
-
 func NewSolonImpl(schema OdysseiaApi, ca []byte) (*SolonImpl, error) {
 	client := NewHttpClient(ca, schema.Cert)
-	return &SolonImpl{Scheme: schema.Scheme, BaseUrl: schema.Url, Client: client}, nil
+	return &SolonImpl{Scheme: schema.Scheme, BaseUrl: schema.Url, Client: client, UUID: ""}, nil
 }
 
 func NewFakeSolonImpl(scheme, baseUrl string, client HttpClient) (*SolonImpl, error) {
-	return &SolonImpl{Scheme: scheme, BaseUrl: baseUrl, Client: client}, nil
+	return &SolonImpl{Scheme: scheme, BaseUrl: baseUrl, Client: client, UUID: ""}, nil
 }
 
-func (s *SolonImpl) OneTimeToken() (*models.TokenResponse, error) {
+func (s *SolonImpl) OneTimeToken() (*http.Response, error) {
 	urlPath := url.URL{
 		Scheme: s.Scheme,
 		Host:   s.BaseUrl,
-		Path:   path.Join(solonService, version, tokenEndpoint),
+		Path:   path.Join(solonService, version, token),
 	}
 
-	response, err := s.Client.Get(&urlPath)
+	response, err := s.Client.Get(&urlPath, s.UUID)
 	if err != nil {
 		return nil, err
 	}
@@ -46,22 +40,14 @@ func (s *SolonImpl) OneTimeToken() (*models.TokenResponse, error) {
 		return nil, fmt.Errorf("expected %v but got %v while calling token endpoint", http.StatusOK, response.StatusCode)
 	}
 
-	defer response.Body.Close()
-
-	var tokenModel models.TokenResponse
-	err = json.NewDecoder(response.Body).Decode(&tokenModel)
-	if err != nil {
-		return nil, err
-	}
-
-	return &tokenModel, nil
+	return response, nil
 }
 
-func (s *SolonImpl) Register(requestBody models.SolonCreationRequest) (*models.SolonResponse, error) {
+func (s *SolonImpl) Register(requestBody models.SolonCreationRequest) (*http.Response, error) {
 	urlPath := url.URL{
 		Scheme: s.Scheme,
 		Host:   s.BaseUrl,
-		Path:   path.Join(solonService, version, registerEndpoint),
+		Path:   path.Join(solonService, version, register),
 	}
 
 	body, err := requestBody.Marshal()
@@ -69,7 +55,7 @@ func (s *SolonImpl) Register(requestBody models.SolonCreationRequest) (*models.S
 		return nil, err
 	}
 
-	response, err := s.Client.Post(&urlPath, body)
+	response, err := s.Client.Post(&urlPath, body, s.UUID)
 	if err != nil {
 		return nil, err
 	}
@@ -78,23 +64,15 @@ func (s *SolonImpl) Register(requestBody models.SolonCreationRequest) (*models.S
 		return nil, fmt.Errorf("expected %v but got %v while calling token endpoint", http.StatusOK, response.StatusCode)
 	}
 
-	defer response.Body.Close()
-
-	var solonResponse models.SolonResponse
-	err = json.NewDecoder(response.Body).Decode(&solonResponse)
-	if err != nil {
-		return nil, err
-	}
-
-	return &solonResponse, nil
+	return response, nil
 }
 
-func (s *SolonImpl) Health() (*models.Health, error) {
+func (s *SolonImpl) Health() (*http.Response, error) {
 	healthPath := url.URL{
 		Scheme: s.Scheme,
 		Host:   s.BaseUrl,
 		Path:   path.Join(solonService, version, healthEndPoint),
 	}
 
-	return Health(healthPath, s.Client)
+	return Health(healthPath, s.Client, s.UUID)
 }

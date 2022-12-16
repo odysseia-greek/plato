@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"github.com/odysseia-greek/plato/models"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -40,7 +41,13 @@ func TestSolonClient(t *testing.T) {
 
 		testClient, err := NewFakeClient(config, codes, responses)
 		assert.Nil(t, err)
-		sut, err := testClient.Solon().OneTimeToken()
+		resp, err := testClient.Solon().OneTimeToken()
+		assert.Nil(t, err)
+		defer resp.Body.Close()
+
+		var sut models.TokenResponse
+		err = json.NewDecoder(resp.Body).Decode(&sut)
+		assert.Nil(t, err)
 		assert.Nil(t, err)
 		assert.Equal(t, token, sut.Token)
 	})
@@ -79,7 +86,14 @@ func TestSolonClient(t *testing.T) {
 
 		testClient, err := NewFakeClient(config, codes, responses)
 		assert.Nil(t, err)
-		sut, err := testClient.Solon().Register(requestBody)
+		resp, err := testClient.Solon().Register(requestBody)
+		assert.Nil(t, err)
+		defer resp.Body.Close()
+
+		var sut models.SolonResponse
+		err = json.NewDecoder(resp.Body).Decode(&sut)
+		assert.Nil(t, err)
+
 		assert.Nil(t, err)
 		assert.True(t, sut.Created)
 	})

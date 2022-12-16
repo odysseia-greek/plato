@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"crypto/x509"
+	uuid2 "github.com/google/uuid"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -25,6 +26,10 @@ type FakeClientImpl struct {
 	codes          []int
 	index          int
 }
+
+const (
+	HeaderKey string = "Aischylos"
+)
 
 func NewHttpClient(caCert []byte, certs []tls.Certificate) HttpClient {
 	client := http.Client{
@@ -60,7 +65,10 @@ func NewFakeHttpClient(responseBodies []string, codes []int) HttpClient {
 }
 
 func (c *ClientImpl) Get(u *url.URL) (*http.Response, error) {
-	resp, err := c.client.Get(u.String())
+	req, _ := http.NewRequest("GET", u.String(), nil)
+	uuid := uuid2.New().String()
+	req.Header.Set(HeaderKey, uuid)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +78,8 @@ func (c *ClientImpl) Get(u *url.URL) (*http.Response, error) {
 
 func (c *ClientImpl) Post(u *url.URL, body []byte) (*http.Response, error) {
 	req, err := http.NewRequest(http.MethodPost, u.String(), bytes.NewBuffer(body))
+	uuid := uuid2.New().String()
+	req.Header.Set(HeaderKey, uuid)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := c.client.Do(req)
@@ -83,6 +93,8 @@ func (c *ClientImpl) Post(u *url.URL, body []byte) (*http.Response, error) {
 func (f *FakeClientImpl) Get(u *url.URL) (*http.Response, error) {
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	req.Header.Set("Content-Type", "application/json")
+	uuid := uuid2.New().String()
+	req.Header.Set(HeaderKey, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -104,6 +116,8 @@ func (f *FakeClientImpl) Get(u *url.URL) (*http.Response, error) {
 func (f *FakeClientImpl) Post(u *url.URL, body []byte) (*http.Response, error) {
 	req, err := http.NewRequest(http.MethodPost, u.String(), bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
+	uuid := uuid2.New().String()
+	req.Header.Set(HeaderKey, uuid)
 	if err != nil {
 		return nil, err
 	}
