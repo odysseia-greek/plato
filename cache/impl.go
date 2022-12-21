@@ -27,9 +27,6 @@ func NewInMemoryBadgerClient() (Client, error) {
 }
 
 func NewBadgerClient(badgerPath string) (Client, error) {
-	if badgerPath == "" {
-		badgerPath = "/tmp/badger"
-	}
 	db, err := badger.Open(badger.DefaultOptions(badgerPath))
 	if err != nil {
 		return nil, err
