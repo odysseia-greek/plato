@@ -33,13 +33,14 @@ func (d *DionysiosImpl) Health(uuid string) (*http.Response, error) {
 }
 
 func (d *DionysiosImpl) Grammar(word string, uuid string) (*http.Response, error) {
-	urlPath := url.URL{
-		Scheme: d.Scheme,
-		Host:   d.BaseUrl,
-		Path:   path.Join(dionysiosService, version, grammar),
-	}
+	query := fmt.Sprintf("%s=%s", searchWord, word)
 
-	urlPath.Query().Set(searchWord, word)
+	urlPath := url.URL{
+		Scheme:   d.Scheme,
+		Host:     d.BaseUrl,
+		Path:     path.Join(dionysiosService, version, grammar),
+		RawQuery: query,
+	}
 
 	response, err := d.Client.Get(&urlPath, uuid)
 	if err != nil {

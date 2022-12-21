@@ -23,13 +23,14 @@ func NewFakeAlexandrosConfig(scheme, baseUrl string, client HttpClient) (*Alexan
 }
 
 func (a *AlexandrosImpl) Search(word string, uuid string) (*http.Response, error) {
-	urlPath := url.URL{
-		Scheme: a.Scheme,
-		Host:   a.BaseUrl,
-		Path:   fmt.Sprintf("%s/%s/%s", alexandrosService, version, search),
-	}
+	query := fmt.Sprintf("%s=%s", searchWord, word)
 
-	urlPath.Query().Set(searchWord, word)
+	urlPath := url.URL{
+		Scheme:   a.Scheme,
+		Host:     a.BaseUrl,
+		Path:     fmt.Sprintf("%s/%s/%s", alexandrosService, version, search),
+		RawQuery: query,
+	}
 
 	response, err := a.Client.Get(&urlPath, uuid)
 	if err != nil {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	uuid2 "github.com/google/uuid"
 	"github.com/odysseia-greek/plato/models"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -41,7 +42,10 @@ func TestSolonClient(t *testing.T) {
 
 		testClient, err := NewFakeClient(config, codes, responses)
 		assert.Nil(t, err)
-		resp, err := testClient.Solon().OneTimeToken()
+
+		uuid := uuid2.New().String()
+
+		resp, err := testClient.Solon().OneTimeToken(uuid)
 		assert.Nil(t, err)
 		defer resp.Body.Close()
 
@@ -66,7 +70,8 @@ func TestSolonClient(t *testing.T) {
 
 		testClient, err := NewFakeClient(config, codes, responses)
 		assert.Nil(t, err)
-		sut, err := testClient.Solon().OneTimeToken()
+		uuid := uuid2.New().String()
+		sut, err := testClient.Solon().OneTimeToken(uuid)
 		assert.NotNil(t, err)
 		assert.Nil(t, sut)
 		assert.Contains(t, err.Error(), "500")
@@ -86,7 +91,8 @@ func TestSolonClient(t *testing.T) {
 
 		testClient, err := NewFakeClient(config, codes, responses)
 		assert.Nil(t, err)
-		resp, err := testClient.Solon().Register(requestBody)
+		uuid := uuid2.New().String()
+		resp, err := testClient.Solon().Register(requestBody, uuid)
 		assert.Nil(t, err)
 		defer resp.Body.Close()
 
@@ -110,9 +116,10 @@ func TestSolonClient(t *testing.T) {
 			string(r),
 		}
 
+		uuid := uuid2.New().String()
 		testClient, err := NewFakeClient(config, codes, responses)
 		assert.Nil(t, err)
-		sut, err := testClient.Solon().Register(requestBody)
+		sut, err := testClient.Solon().Register(requestBody, uuid)
 		assert.NotNil(t, err)
 		assert.Nil(t, sut)
 		assert.Contains(t, err.Error(), "500")
