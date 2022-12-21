@@ -22,17 +22,17 @@ func NewFakeDionysiosConfig(scheme, baseUrl string, client HttpClient) (*Dionysi
 	return &DionysiosImpl{Scheme: scheme, BaseUrl: baseUrl, Client: client}, nil
 }
 
-func (d *DionysiosImpl) Health() (*http.Response, error) {
+func (d *DionysiosImpl) Health(uuid string) (*http.Response, error) {
 	healthPath := url.URL{
 		Scheme: d.Scheme,
 		Host:   d.BaseUrl,
 		Path:   path.Join(dionysiosService, version, healthEndPoint),
 	}
 
-	return Health(healthPath, d.Client)
+	return Health(healthPath, d.Client, uuid)
 }
 
-func (d *DionysiosImpl) Grammar(word string) (*http.Response, error) {
+func (d *DionysiosImpl) Grammar(word string, uuid string) (*http.Response, error) {
 	urlPath := url.URL{
 		Scheme: d.Scheme,
 		Host:   d.BaseUrl,
@@ -41,7 +41,7 @@ func (d *DionysiosImpl) Grammar(word string) (*http.Response, error) {
 
 	urlPath.Query().Set(searchWord, word)
 
-	response, err := d.Client.Get(&urlPath)
+	response, err := d.Client.Get(&urlPath, uuid)
 	if err != nil {
 		return nil, err
 	}

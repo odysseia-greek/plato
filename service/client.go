@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"crypto/x509"
-	uuid2 "github.com/google/uuid"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -13,8 +12,8 @@ import (
 )
 
 type HttpClient interface {
-	Get(u *url.URL) (*http.Response, error)
-	Post(u *url.URL, body []byte) (*http.Response, error)
+	Get(u *url.URL, uuid string) (*http.Response, error)
+	Post(u *url.URL, body []byte, uuid string) (*http.Response, error)
 }
 
 type ClientImpl struct {
@@ -26,10 +25,6 @@ type FakeClientImpl struct {
 	codes          []int
 	index          int
 }
-
-const (
-	HeaderKey string = "Aischylos"
-)
 
 func NewHttpClient(caCert []byte, certs []tls.Certificate) HttpClient {
 	client := http.Client{
@@ -64,9 +59,8 @@ func NewFakeHttpClient(responseBodies []string, codes []int) HttpClient {
 	}
 }
 
-func (c *ClientImpl) Get(u *url.URL) (*http.Response, error) {
+func (c *ClientImpl) Get(u *url.URL, uuid string) (*http.Response, error) {
 	req, _ := http.NewRequest("GET", u.String(), nil)
-	uuid := uuid2.New().String()
 	req.Header.Set(HeaderKey, uuid)
 	resp, err := c.client.Do(req)
 	if err != nil {
@@ -76,9 +70,8 @@ func (c *ClientImpl) Get(u *url.URL) (*http.Response, error) {
 	return resp, nil
 }
 
-func (c *ClientImpl) Post(u *url.URL, body []byte) (*http.Response, error) {
+func (c *ClientImpl) Post(u *url.URL, body []byte, uuid string) (*http.Response, error) {
 	req, err := http.NewRequest(http.MethodPost, u.String(), bytes.NewBuffer(body))
-	uuid := uuid2.New().String()
 	req.Header.Set(HeaderKey, uuid)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -90,10 +83,9 @@ func (c *ClientImpl) Post(u *url.URL, body []byte) (*http.Response, error) {
 	return resp, nil
 }
 
-func (f *FakeClientImpl) Get(u *url.URL) (*http.Response, error) {
+func (f *FakeClientImpl) Get(u *url.URL, uuid string) (*http.Response, error) {
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	req.Header.Set("Content-Type", "application/json")
-	uuid := uuid2.New().String()
 	req.Header.Set(HeaderKey, uuid)
 	if err != nil {
 		return nil, err
@@ -113,10 +105,9 @@ func (f *FakeClientImpl) Get(u *url.URL) (*http.Response, error) {
 	return &response, nil
 }
 
-func (f *FakeClientImpl) Post(u *url.URL, body []byte) (*http.Response, error) {
+func (f *FakeClientImpl) Post(u *url.URL, body []byte, uuid string) (*http.Response, error) {
 	req, err := http.NewRequest(http.MethodPost, u.String(), bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
-	uuid := uuid2.New().String()
 	req.Header.Set(HeaderKey, uuid)
 	if err != nil {
 		return nil, err

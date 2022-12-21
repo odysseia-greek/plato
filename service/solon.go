@@ -23,14 +23,14 @@ func NewFakeSolonImpl(scheme, baseUrl string, client HttpClient) (*SolonImpl, er
 	return &SolonImpl{Scheme: scheme, BaseUrl: baseUrl, Client: client}, nil
 }
 
-func (s *SolonImpl) OneTimeToken() (*http.Response, error) {
+func (s *SolonImpl) OneTimeToken(uuid string) (*http.Response, error) {
 	urlPath := url.URL{
 		Scheme: s.Scheme,
 		Host:   s.BaseUrl,
 		Path:   path.Join(solonService, version, token),
 	}
 
-	response, err := s.Client.Get(&urlPath)
+	response, err := s.Client.Get(&urlPath, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (s *SolonImpl) OneTimeToken() (*http.Response, error) {
 	return response, nil
 }
 
-func (s *SolonImpl) Register(requestBody models.SolonCreationRequest) (*http.Response, error) {
+func (s *SolonImpl) Register(requestBody models.SolonCreationRequest, uuid string) (*http.Response, error) {
 	urlPath := url.URL{
 		Scheme: s.Scheme,
 		Host:   s.BaseUrl,
@@ -54,7 +54,7 @@ func (s *SolonImpl) Register(requestBody models.SolonCreationRequest) (*http.Res
 		return nil, err
 	}
 
-	response, err := s.Client.Post(&urlPath, body)
+	response, err := s.Client.Post(&urlPath, body, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -66,12 +66,12 @@ func (s *SolonImpl) Register(requestBody models.SolonCreationRequest) (*http.Res
 	return response, nil
 }
 
-func (s *SolonImpl) Health() (*http.Response, error) {
+func (s *SolonImpl) Health(uuid string) (*http.Response, error) {
 	healthPath := url.URL{
 		Scheme: s.Scheme,
 		Host:   s.BaseUrl,
 		Path:   path.Join(solonService, version, healthEndPoint),
 	}
 
-	return Health(healthPath, s.Client)
+	return Health(healthPath, s.Client, uuid)
 }

@@ -25,14 +25,14 @@ func NewFakeHerodotosConfig(scheme, baseUrl string, client HttpClient) (*Herodot
 	return &HerodotosImpl{Scheme: scheme, BaseUrl: baseUrl, Client: client}, nil
 }
 
-func (h *HerodotosImpl) GetAuthors() (*http.Response, error) {
+func (h *HerodotosImpl) GetAuthors(uuid string) (*http.Response, error) {
 	authorPath := url.URL{
 		Scheme: h.Scheme,
 		Host:   h.BaseUrl,
 		Path:   fmt.Sprintf("%s/%s/%s", herodotosService, version, authors),
 	}
 
-	response, err := h.Client.Get(&authorPath)
+	response, err := h.Client.Get(&authorPath, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -44,14 +44,14 @@ func (h *HerodotosImpl) GetAuthors() (*http.Response, error) {
 	return response, nil
 }
 
-func (h *HerodotosImpl) GetBooks(authorId string) (*http.Response, error) {
+func (h *HerodotosImpl) GetBooks(authorId string, uuid string) (*http.Response, error) {
 	bookPath := url.URL{
 		Scheme: h.Scheme,
 		Host:   h.BaseUrl,
 		Path:   fmt.Sprintf("%s/%s/%s/%s/%s", herodotosService, version, authors, authorId, books),
 	}
 
-	response, err := h.Client.Get(&bookPath)
+	response, err := h.Client.Get(&bookPath, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (h *HerodotosImpl) GetBooks(authorId string) (*http.Response, error) {
 	return response, nil
 }
 
-func (h *HerodotosImpl) CreateQuestion(author, book string) (*http.Response, error) {
+func (h *HerodotosImpl) CreateQuestion(author, book, uuid string) (*http.Response, error) {
 	query := fmt.Sprintf("author=%s&book=%s", author, book)
 	questionPath := url.URL{
 		Scheme:   h.Scheme,
@@ -72,7 +72,7 @@ func (h *HerodotosImpl) CreateQuestion(author, book string) (*http.Response, err
 		RawQuery: query,
 	}
 
-	response, err := h.Client.Get(&questionPath)
+	response, err := h.Client.Get(&questionPath, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (h *HerodotosImpl) CreateQuestion(author, book string) (*http.Response, err
 
 }
 
-func (h *HerodotosImpl) CheckSentence(checkSentenceRequest models.CheckSentenceRequest) (*http.Response, error) {
+func (h *HerodotosImpl) CheckSentence(checkSentenceRequest models.CheckSentenceRequest, uuid string) (*http.Response, error) {
 	sentencePath := url.URL{
 		Scheme: h.Scheme,
 		Host:   h.BaseUrl,
@@ -97,7 +97,7 @@ func (h *HerodotosImpl) CheckSentence(checkSentenceRequest models.CheckSentenceR
 		return nil, err
 	}
 
-	response, err := h.Client.Post(&sentencePath, body)
+	response, err := h.Client.Post(&sentencePath, body, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -109,12 +109,12 @@ func (h *HerodotosImpl) CheckSentence(checkSentenceRequest models.CheckSentenceR
 	return response, nil
 }
 
-func (h *HerodotosImpl) Health() (*http.Response, error) {
+func (h *HerodotosImpl) Health(uuid string) (*http.Response, error) {
 	healthPath := url.URL{
 		Scheme: h.Scheme,
 		Host:   h.BaseUrl,
 		Path:   path.Join(herodotosService, version, healthEndPoint),
 	}
 
-	return Health(healthPath, h.Client)
+	return Health(healthPath, h.Client, uuid)
 }

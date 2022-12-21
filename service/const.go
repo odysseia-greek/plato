@@ -1,6 +1,11 @@
 package service
 
 const (
+	version        string = "v1"
+	healthEndPoint string = "health"
+
+	HeaderKey string = "aischylos"
+
 	alexandrosService string = "alexandros"
 	search            string = "search"
 	searchWord        string = "word"

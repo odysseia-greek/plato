@@ -23,24 +23,24 @@ func NewSokratesConfig(schema OdysseiaApi, ca []byte) (*SokratesImpl, error) {
 func NewFakeSokratesConfig(scheme, baseUrl string, client HttpClient) (*SokratesImpl, error) {
 	return &SokratesImpl{Scheme: scheme, BaseUrl: baseUrl, Client: client}, nil
 }
-func (s *SokratesImpl) Health() (*http.Response, error) {
+func (s *SokratesImpl) Health(uuid string) (*http.Response, error) {
 	healthPath := url.URL{
 		Scheme: s.Scheme,
 		Host:   s.BaseUrl,
 		Path:   path.Join(sokratesService, version, healthEndPoint),
 	}
 
-	return Health(healthPath, s.Client)
+	return Health(healthPath, s.Client, uuid)
 }
 
-func (s *SokratesImpl) GetMethods() (*http.Response, error) {
+func (s *SokratesImpl) GetMethods(uuid string) (*http.Response, error) {
 	methodPath := url.URL{
 		Scheme: s.Scheme,
 		Host:   s.BaseUrl,
 		Path:   fmt.Sprintf("%s/%s/%s", sokratesService, version, methods),
 	}
 
-	response, err := s.Client.Get(&methodPath)
+	response, err := s.Client.Get(&methodPath, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -52,14 +52,14 @@ func (s *SokratesImpl) GetMethods() (*http.Response, error) {
 	return response, nil
 }
 
-func (s *SokratesImpl) GetCategories(method string) (*http.Response, error) {
+func (s *SokratesImpl) GetCategories(method, uuid string) (*http.Response, error) {
 	categoryPath := url.URL{
 		Scheme: s.Scheme,
 		Host:   s.BaseUrl,
 		Path:   fmt.Sprintf("%s/%s/%s/%s/%s", sokratesService, version, methods, method, categories),
 	}
 
-	response, err := s.Client.Get(&categoryPath)
+	response, err := s.Client.Get(&categoryPath, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -71,14 +71,14 @@ func (s *SokratesImpl) GetCategories(method string) (*http.Response, error) {
 	return response, nil
 }
 
-func (s *SokratesImpl) GetChapters(method, category string) (*http.Response, error) {
+func (s *SokratesImpl) GetChapters(method, category, uuid string) (*http.Response, error) {
 	chapterPath := url.URL{
 		Scheme: s.Scheme,
 		Host:   s.BaseUrl,
 		Path:   fmt.Sprintf("%s/%s/%s/%s/%s/%s/%s", sokratesService, version, methods, method, categories, category, chapters),
 	}
 
-	response, err := s.Client.Get(&chapterPath)
+	response, err := s.Client.Get(&chapterPath, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (s *SokratesImpl) GetChapters(method, category string) (*http.Response, err
 	return response, nil
 }
 
-func (s *SokratesImpl) CreateQuestion(method, category, chapter string) (*http.Response, error) {
+func (s *SokratesImpl) CreateQuestion(method, category, chapter, uuid string) (*http.Response, error) {
 	query := fmt.Sprintf("method=%s&category=%s&chapter=%s", method, category, chapter)
 	questionPath := url.URL{
 		Scheme:   s.Scheme,
@@ -99,7 +99,7 @@ func (s *SokratesImpl) CreateQuestion(method, category, chapter string) (*http.R
 		RawQuery: query,
 	}
 
-	response, err := s.Client.Get(&questionPath)
+	response, err := s.Client.Get(&questionPath, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (s *SokratesImpl) CreateQuestion(method, category, chapter string) (*http.R
 	return response, nil
 }
 
-func (s *SokratesImpl) CheckAnswer(checkAnswerRequest models.CheckAnswerRequest) (*http.Response, error) {
+func (s *SokratesImpl) CheckAnswer(checkAnswerRequest models.CheckAnswerRequest, uuid string) (*http.Response, error) {
 	answerPath := url.URL{
 		Scheme: s.Scheme,
 		Host:   s.BaseUrl,
@@ -123,7 +123,7 @@ func (s *SokratesImpl) CheckAnswer(checkAnswerRequest models.CheckAnswerRequest)
 		return nil, err
 	}
 
-	response, err := s.Client.Post(&answerPath, body)
+	response, err := s.Client.Post(&answerPath, body, uuid)
 	if err != nil {
 		return nil, err
 	}

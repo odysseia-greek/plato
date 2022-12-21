@@ -22,7 +22,7 @@ func NewFakeAlexandrosConfig(scheme, baseUrl string, client HttpClient) (*Alexan
 	return &AlexandrosImpl{Scheme: scheme, BaseUrl: baseUrl, Client: client}, nil
 }
 
-func (a *AlexandrosImpl) Search(word string) (*http.Response, error) {
+func (a *AlexandrosImpl) Search(word string, uuid string) (*http.Response, error) {
 	urlPath := url.URL{
 		Scheme: a.Scheme,
 		Host:   a.BaseUrl,
@@ -31,7 +31,7 @@ func (a *AlexandrosImpl) Search(word string) (*http.Response, error) {
 
 	urlPath.Query().Set(searchWord, word)
 
-	response, err := a.Client.Get(&urlPath)
+	response, err := a.Client.Get(&urlPath, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -43,12 +43,12 @@ func (a *AlexandrosImpl) Search(word string) (*http.Response, error) {
 	return response, nil
 }
 
-func (a *AlexandrosImpl) Health() (*http.Response, error) {
+func (a *AlexandrosImpl) Health(uuid string) (*http.Response, error) {
 	healthPath := url.URL{
 		Scheme: a.Scheme,
 		Host:   a.BaseUrl,
 		Path:   path.Join(alexandrosService, version, healthEndPoint),
 	}
 
-	return Health(healthPath, a.Client)
+	return Health(healthPath, a.Client, uuid)
 }

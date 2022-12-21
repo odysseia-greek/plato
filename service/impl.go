@@ -23,36 +23,36 @@ type Odysseia struct {
 }
 
 type Solon interface {
-	Health() (*http.Response, error)
-	OneTimeToken() (*http.Response, error)
-	Register(requestBody models.SolonCreationRequest) (*http.Response, error)
+	Health(uuid string) (*http.Response, error)
+	OneTimeToken(uuid string) (*http.Response, error)
+	Register(requestBody models.SolonCreationRequest, uuid string) (*http.Response, error)
 }
 
 type Herodotos interface {
-	Health() (*http.Response, error)
-	GetAuthors() (*http.Response, error)
-	GetBooks(authorId string) (*http.Response, error)
-	CreateQuestion(author, book string) (*http.Response, error)
-	CheckSentence(checkSentenceRequest models.CheckSentenceRequest) (*http.Response, error)
+	Health(uuid string) (*http.Response, error)
+	GetAuthors(uuid string) (*http.Response, error)
+	GetBooks(authorId, uuid string) (*http.Response, error)
+	CreateQuestion(author, book, uuid string) (*http.Response, error)
+	CheckSentence(checkSentenceRequest models.CheckSentenceRequest, uuid string) (*http.Response, error)
 }
 
 type Alexandros interface {
-	Health() (*http.Response, error)
-	Search(word string) (*http.Response, error)
+	Health(uuid string) (*http.Response, error)
+	Search(word, uuid string) (*http.Response, error)
 }
 
 type Sokrates interface {
-	Health() (*http.Response, error)
-	GetMethods() (*http.Response, error)
-	GetCategories(method string) (*http.Response, error)
-	GetChapters(method, category string) (*http.Response, error)
-	CreateQuestion(method, category, chapter string) (*http.Response, error)
-	CheckAnswer(checkAnswerRequest models.CheckAnswerRequest) (*http.Response, error)
+	Health(uuid string) (*http.Response, error)
+	GetMethods(uuid string) (*http.Response, error)
+	GetCategories(method, uuid string) (*http.Response, error)
+	GetChapters(method, category, uuid string) (*http.Response, error)
+	CreateQuestion(method, category, chapter, uuid string) (*http.Response, error)
+	CheckAnswer(checkAnswerRequest models.CheckAnswerRequest, uuid string) (*http.Response, error)
 }
 
 type Dionysios interface {
-	Health() (*http.Response, error)
-	Grammar(word string) (*http.Response, error)
+	Health(uuid string) (*http.Response, error)
+	Grammar(word string, uuid string) (*http.Response, error)
 }
 
 type ClientConfig struct {

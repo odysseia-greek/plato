@@ -6,13 +6,8 @@ import (
 	"net/url"
 )
 
-const (
-	version        string = "v1"
-	healthEndPoint string = "health"
-)
-
-func Health(path url.URL, client HttpClient) (*http.Response, error) {
-	response, err := client.Get(&path)
+func Health(path url.URL, client HttpClient, uuid string) (*http.Response, error) {
+	response, err := client.Get(&path, uuid)
 	if err != nil {
 		return nil, err
 	}
